@@ -10,14 +10,14 @@
 - Grafana successfully connected to Loki using the X-Scope-OrgID header.
 - Loki log search was verified in Grafana Explore.
 - Jaeger UI, trace search, and span details were verified.
-- Jaeger currently shows its own API traces; Robot Shop application traces are not yet verified.
+- Jaeger OTLP HTTP ingestion was verified with synthetic test traces.
+- Robot Shop application-level tracing remains pending instrumentation.
 
 ## Pending Verification
 - Slack notification delivery: requires a Slack workspace and incoming webhook.
 - Robot Shop application tracing: requires OpenTelemetry instrumentation.
-- Alert firing: a firing test has not yet been completed.
+- Alert firing: verified with a temporary Prometheus test alert, which was then deleted.
 
 ## Next Actions
 - Instrument a Robot Shop service with OpenTelemetry and confirm an application trace in Jaeger.
-- Test alert firing.
 - Configure notification delivery if a Slack workspace becomes available.
