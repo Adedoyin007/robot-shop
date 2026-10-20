@@ -126,3 +126,37 @@ $ curl http://<host>:8080/api/cart/metrics
 $ curl http://<host>:8080/api/payment/metrics
 ```
 
+
+---
+
+## TS Academy Capstone 2 — Monitoring and Observability
+
+### Deployment
+- Application: Stan's Robot Shop deployed on Amazon EKS.
+- AWS Region: `eu-west-2`.
+- Kubernetes namespaces: `robot-shop` and `monitoring`.
+
+### Monitoring Stack
+- **Prometheus:** Metrics collection and alert-rule evaluation.
+- **Grafana:** Monitoring dashboards and log exploration.
+- **Fluent Bit:** Kubernetes log collection and forwarding.
+- **Loki:** Centralized log storage and querying.
+- **Jaeger:** Distributed tracing UI.
+- **Alertmanager:** Alert notification management.
+
+### Application Metrics
+Prometheus metrics are available from the Robot Shop `cart` and `payment` services. The dashboard configuration is stored in `monitoring/grafana/robot-shop-application-metrics.json`.
+
+### Logging and Tracing
+- Loki log searches were verified through Grafana Explore.
+- Jaeger trace search and span details were verified. The confirmed trace was from Jaeger's own API; Robot Shop application tracing remains pending instrumentation.
+
+### Reliability and Incident Response
+- Availability objective and error-budget policy: `docs/slo-error-budget.md`.
+- Incident response instructions: `docs/incident-runbook.md`.
+- Incident review: `docs/incident-postmortem.md`.
+- Monitoring verification status: `docs/monitoring-status.md`.
+- Prometheus alert rule: `monitoring/alerts/robot-shop-alerts.yaml`.
+
+### Current Limitations
+Robot Shop application-level tracing and alert firing tests remain pending. Slack notification delivery is not configured.
