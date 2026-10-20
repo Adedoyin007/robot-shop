@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: robot-shop-alerts
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: robot-shop-availability
+      rules:
+        - alert: RobotShopPodNotReady
+          expr: kube_pod_status_ready{namespace="robot-shop", condition="true"} == 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Robot Shop pod is not ready"
+            description: "A Robot Shop pod has been unready for at least 5 minutes. Check pod health and recent events."
+            runbook_url: "https://github.com/Adedoyin007/robot-shop/blob/master/docs/incident-runbook.md"
