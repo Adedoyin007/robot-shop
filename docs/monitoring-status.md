@@ -7,14 +7,17 @@
 - The alert is currently Inactive because its condition is not triggering.
 - The alert includes a link to docs/incident-runbook.md.
 - Fluent Bit, Loki, and Jaeger pods are running.
+- Grafana successfully connected to Loki using the X-Scope-OrgID header.
+- Loki log search was verified in Grafana Explore.
+- Jaeger UI, trace search, and span details were verified.
+- Jaeger currently shows its own API traces; Robot Shop application traces are not yet verified.
 
 ## Pending Verification
 - Slack notification delivery: requires a Slack workspace and incoming webhook.
-- Loki log search: Grafana could not connect to the Loki data source.
-- Jaeger tracing: a real application trace has not yet been confirmed.
+- Robot Shop application tracing: requires OpenTelemetry instrumentation.
 - Alert firing: a firing test has not yet been completed.
 
 ## Next Actions
-- Verify Loki connectivity and searchable logs.
-- Instrument one Robot Shop service with OpenTelemetry and confirm a trace in Jaeger.
-- Test alert firing and notification delivery.
+- Instrument a Robot Shop service with OpenTelemetry and confirm an application trace in Jaeger.
+- Test alert firing.
+- Configure notification delivery if a Slack workspace becomes available.
