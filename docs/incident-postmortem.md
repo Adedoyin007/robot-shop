@@ -33,3 +33,28 @@ Reduced load generation and restarted the shipping service. The service recovere
 ## Blameless Statement
 The incident exposed gaps in resource monitoring and capacity planning.
 The focus is on improving system safeguards and response procedures, not blaming individuals.
+
+## Incident Drill — Cart Pod Recovery
+
+**Date:** 21 October 2026  
+**Service:** Cart  
+**Severity:** Simulated incident (controlled drill)
+
+### What happened
+The Cart pod was deliberately deleted to simulate a pod failure during an incident drill.
+
+### Impact
+Cart was briefly unavailable while Kubernetes recreated the pod.
+
+### Detection and response
+The replacement Cart pod returned to `1/1 Running`. A request to the Cart service returned an HTTP `404 Not Found` for `/`, confirming the Express service responded; `/` is not a defined Cart route.
+
+### Root cause
+No application failure was identified during this drill. The pod deletion was intentional to test Kubernetes recovery.
+
+### Resolution
+Kubernetes automatically recreated the Cart pod under its Deployment controller.
+
+### Follow-up actions
+- Verify a valid Cart API route after recovery.
+- Confirm alerting and notification delivery during a future controlled incident.
