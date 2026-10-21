@@ -1,162 +1,247 @@
-# Sample Microservice Application
+# TS Academy DevOps Capstone 2 — Stan's Robot Shop
 
-Stan's Robot Shop is a sample microservice application you can use as a sandbox to test and learn containerised application orchestration and monitoring techniques. It is not intended to be a comprehensive reference example of how to write a microservices application, although you will better understand some of those concepts by playing with Stan's Robot Shop. To be clear, the error handling is patchy and there is not any security built into the application.
+## Project Overview
 
-You can get more detailed information from my [blog post](https://www.instana.com/blog/stans-robot-shop-sample-microservice-application/) about this sample microservice application.
+This project implements the monitoring, logging, distributed tracing, alerting, and incident-management requirements for **TS Academy DevOps Capstone 2: Stan's Robot Shop**.
 
-This sample microservice application has been built using these technologies:
-- NodeJS ([Express](http://expressjs.com/))
-- Java ([Spring Boot](https://spring.io/))
-- Python ([Flask](http://flask.pocoo.org))
-- Golang
-- PHP (Apache)
-- MongoDB
-- Redis
-- MySQL ([Maxmind](http://www.maxmind.com) data)
-- RabbitMQ
-- Nginx
-- AngularJS (1.x)
+Robot Shop runs on Amazon EKS. The project uses Prometheus and Grafana for monitoring, Fluent Bit and Loki for centralized logging, OpenTelemetry and Jaeger for distributed tracing, and Alertmanager with Slack for alert notifications.
 
-The various services in the sample application already include all required Instana components installed and configured. The Instana components provide automatic instrumentation for complete end to end [tracing](https://docs.instana.io/core_concepts/tracing/), as well as complete visibility into time series metrics for all the technologies.
+**GitHub Repository:** https://github.com/Adedoyin007/robot-shop
 
-To see the application performance results in the Instana dashboard, you will first need an Instana account. Don't worry a [trial account](https://instana.com/trial?utm_source=github&utm_medium=robot_shop) is free.
+**AWS Region:** `eu-west-2`
 
-## Build from Source
-To optionally build from source (you will need a newish version of Docker to do this) use Docker Compose. Optionally edit the `.env` file to specify an alternative image registry and version tag; see the official [documentation](https://docs.docker.com/compose/env-file/) for more information.
+**Kubernetes Cluster:** `voting-app-eks`
 
-To download the tracing module for Nginx, it needs a valid Instana agent key. Set this in the environment before starting the build.
+**Application Namespace:** `robot-shop`
 
-```shell
-$ export INSTANA_AGENT_KEY="<your agent key>"
-```
+**Monitoring Namespace:** `monitoring`
 
-Now build all the images.
+## 1. Project Architecture
 
-```shell
-$ docker-compose build
-```
+The application runs on Kubernetes. Prometheus collects metrics, Grafana displays monitoring dashboards, Fluent Bit forwards logs to Loki, and OpenTelemetry instrumentation sends Cart traces to Jaeger. Alertmanager routes matching alerts to a Slack channel.
 
-If you modified the `.env` file and changed the image registry, you need to push the images to that registry
+### Architecture components
 
-```shell
-$ docker-compose push
-```
-
-## Run Locally
-You can run it locally for testing.
-
-If you did not build from source, don't worry all the images are on Docker Hub. Just pull down those images first using:
-
-```shell
-$ docker-compose pull
-```
-
-Fire up Stan's Robot Shop with:
-
-```shell
-$ docker-compose up
-```
-
-If you want to fire up some load as well:
-
-```shell
-$ docker-compose -f docker-compose.yaml -f docker-compose-load.yaml up
-```
-
-If you are running it locally on a Linux host you can also run the Instana [agent](https://docs.instana.io/quick_start/agent_setup/container/docker/) locally, unfortunately the agent is currently not supported on Mac.
-
-There is also only limited support on ARM architectures at the moment.
-
-## Marathon / DCOS
-
-The manifests for robotshop are in the *DCOS/* directory. These manifests were built using a fresh install of DCOS 1.11.0. They should work on a vanilla HA or single instance install.
-
-You may install Instana via the DCOS package manager, instructions are here: https://github.com/dcos/examples/tree/master/instana-agent/1.9
-
-## Kubernetes
-You can run Kubernetes locally using [minikube](https://github.com/kubernetes/minikube) or on one of the many cloud providers.
-
-The Docker container images are all available on [Docker Hub](https://hub.docker.com/u/robotshop/).
-
-Install Stan's Robot Shop to your Kubernetes cluster using the [Helm](K8s/helm/README.md) chart.
-
-To deploy the Instana agent to Kubernetes, just use the [helm](https://github.com/instana/helm-charts) chart.
-
-## Accessing the Store
-If you are running the store locally via *docker-compose up* then, the store front is available on localhost port 8080 [http://localhost:8080](http://localhost:8080/)
-
-If you are running the store on Kubernetes via minikube then, find the IP address of Minikube and the Node Port of the web service.
-
-```shell
-$ minikube ip
-$ kubectl get svc web
-```
-
-If you are using a cloud Kubernetes / Openshift / Mesosphere then it will be available on the load balancer of that system.
-
-## Load Generation
-A separate load generation utility is provided in the `load-gen` directory. This is not automatically run when the application is started. The load generator is built with Python and [Locust](https://locust.io). The `build.sh` script builds the Docker image, optionally taking *push* as the first argument to also push the image to the registry. The registry and tag settings are loaded from the `.env` file in the parent directory. The script `load-gen.sh` runs the image, it takes a number of command line arguments. You could run the container inside an orchestration system (K8s) as well if you want to, an example descriptor is provided in K8s directory. For End-user Monitoring ,load is not automatically generated but by navigating through the Robotshop from the browser .For more details see the [README](load-gen/README.md) in the load-gen directory.  
-
-## Website Monitoring / End-User Monitoring
-
-### Docker Compose
-
-To enable Website Monioring / End-User Monitoring (EUM) see the official [documentation](https://docs.instana.io/website_monitoring/) for how to create a configuration. There is no need to inject the JavaScript fragment into the page, this will be handled automatically. Just make a note of the unique key and set the environment variable `INSTANA_EUM_KEY` and `INSTANA_EUM_REPORTING_URL` for the web image within `docker-compose.yaml`.
-
-### Kubernetes
-
-The Helm chart for installing Stan's Robot Shop supports setting the key and endpoint url required for website monitoring, see the [README](K8s/helm/README.md).
-
-## Prometheus
-
-The cart and payment services both have Prometheus metric endpoints. These are accessible on `/metrics`. The cart service provides:
-
-* Counter of the number of items added to the cart
-
-The payment services provides:
-
-* Counter of the number of items perchased
-* Histogram of the total number of items in each cart
-* Histogram of the total value of each cart
-
-To test the metrics use:
-
-```shell
-$ curl http://<host>:8080/api/cart/metrics
-$ curl http://<host>:8080/api/payment/metrics
-```
-
-
----
-
-## TS Academy Capstone 2 — Monitoring and Observability
-
-### Deployment
-- Application: Stan's Robot Shop deployed on Amazon EKS.
-- AWS Region: `eu-west-2`.
-- Kubernetes namespaces: `robot-shop` and `monitoring`.
-
-### Monitoring Stack
-- **Prometheus:** Metrics collection and alert-rule evaluation.
+- **Amazon EKS:** Kubernetes platform for Robot Shop.
+- **Prometheus:** Metrics collection and alert evaluation.
 - **Grafana:** Monitoring dashboards and log exploration.
-- **Fluent Bit:** Kubernetes log collection and forwarding.
-- **Loki:** Centralized log storage and querying.
-- **Jaeger:** Distributed tracing UI.
-- **Alertmanager:** Alert notification management.
+- **Fluent Bit and Loki:** Log collection, storage, and search.
+- **OpenTelemetry and Jaeger:** Distributed tracing for the Cart service.
+- **Alertmanager and Slack:** Alert notifications.
+- **Kubernetes Prometheus Operator:** Manages monitoring rules and Alertmanager configuration.
 
-### Application Metrics
-Prometheus metrics are available from the Robot Shop `cart` and `payment` services. The dashboard configuration is stored in `monitoring/grafana/robot-shop-application-metrics.json`.
+![Project architecture](screenshots/01-project-architecture.png)
 
-### Logging and Tracing
-- Loki log searches were verified through Grafana Explore.
-- Jaeger trace search and span details were verified. The confirmed trace was from Jaeger's own API; Robot Shop application tracing remains pending instrumentation.
+*Screenshot 1: Robot Shop project architecture and monitoring components.*
 
-### Reliability and Incident Response
-- Availability objective and error-budget policy: `docs/slo-error-budget.md`.
-- Incident response instructions: `docs/incident-runbook.md`.
-- Incident review: `docs/incident-postmortem.md`.
-- Monitoring verification status: `docs/monitoring-status.md`.
-- Prometheus alert rule: `monitoring/alerts/robot-shop-alerts.yaml`.
+## 2. Step One — Deploy Robot Shop and Verify Application Health
 
-### Current Limitations
-Robot Shop application-level tracing and alert firing tests remain pending. Slack notification delivery is not configured.
+Robot Shop was deployed to the existing EKS cluster in the `robot-shop` namespace. The application includes its web frontend, backend services, and supporting datastores.
+
+A load generator was also used to create application traffic for monitoring and testing.
+
+### Verification
+
+The Kubernetes workload status was checked to confirm that the application pods were running. The web frontend and results from application activity were also checked during the deployment process.
+
+Commands used for verification included:
+
+```bash
+kubectl get pods -n robot-shop
+kubectl get services -n robot-shop
+kubectl get deployments -n robot-shop
+```
+
+![Robot Shop pods running](screenshots/02-robot-shop-pods.png)
+
+*Screenshot 2: Robot Shop application pods running in the `robot-shop` namespace.*
+
+![Robot Shop application](screenshots/03-robot-shop-application.png)
+
+*Screenshot 3: Robot Shop web application running successfully.*
+
+## 3. Step Two — Install Monitoring and Configure Grafana
+
+The `kube-prometheus-stack` Helm chart was installed in the `monitoring` namespace. This provided Prometheus, Grafana, Alertmanager, and supporting monitoring components.
+
+Grafana was accessed through Kubernetes port forwarding:
+
+```bash
+kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
+```
+
+Grafana was then opened at `http://localhost:3000`.
+
+### Dashboard export
+
+The dashboard was exported and committed to the repository:
+
+`monitoring/grafana/robot-shop-application-metrics.json`
+
+The exported dashboard currently contains business metrics including:
+
+- Items added to cart.
+- Total items sold.
+- Average cart value over five minutes.
+
+![Grafana dashboard](screenshots/04-grafana-dashboard.png)
+
+*Screenshot 4: Grafana dashboard displaying Robot Shop business metrics.*
+
+**Known improvement:** The dashboard still needs panels for request rate, error rate, and latency to fully demonstrate the metrics-dashboard requirement.
+
+## 4. Step Three — Configure Centralized Logging
+
+Fluent Bit was configured to collect application logs and forward them to Loki. Grafana was used to query and inspect the collected logs.
+
+The Loki datasource was configured with the in-cluster service address:
+
+`http://loki.monitoring.svc.cluster.local:3100`
+
+The datasource also uses the `X-Scope-OrgID` header with value `1`.
+
+### Verification
+
+Logs were searched in Grafana to confirm that the logging pipeline was operational. Log exploration was used to inspect application output and investigate service behaviour.
+
+![Fluent Bit and Loki](screenshots/05-logging-pipeline.png)
+
+*Screenshot 5: Centralized application logs queried through Grafana Explore and Loki.*
+
+## 5. Step Four — Configure Distributed Tracing
+
+OpenTelemetry instrumentation was added to the Cart service. The instrumented Cart image is:
+
+`asiwaju007/rs-cart:otel`
+
+Jaeger was accessed through port forwarding:
+
+```bash
+kubectl port-forward -n monitoring svc/jaeger 16686:16686
+```
+
+The Jaeger interface was opened at `http://localhost:16686`.
+
+### Verification
+
+The `cart` service appeared in Jaeger, and application traces were observed. This confirmed that the Cart instrumentation was producing trace data that could be inspected during troubleshooting.
+
+![Jaeger Cart traces](screenshots/06-jaeger-traces.png)
+
+*Screenshot 6: Distributed traces for the Cart service in Jaeger.*
+
+## 6. Step Five — Define the SLO and Configure Slack Alerts
+
+An availability SLO and error-budget policy were documented in:
+
+`docs/slo-error-budget.md`
+
+A Prometheus alert rule was created in:
+
+`monitoring/` — Prometheus rule named `robot-shop-alerts`.
+
+The `RobotShopPodNotReady` alert evaluates the readiness of pods in the `robot-shop` namespace and fires when the expression remains true for five minutes.
+
+The alert includes a runbook reference:
+
+`docs/incident-runbook.md`
+
+### Slack integration
+
+An incoming webhook was created for the Slack channel `#random`. A Kubernetes Secret named `alertmanager-slack-webhook` stores the webhook URL. The URL itself is not committed to Git.
+
+The Alertmanager configuration is stored in:
+
+`monitoring/alertmanager/robot-shop-slack.yaml`
+
+### Verification
+
+A temporary test alert named `RobotShopSlackDeliveryTest` was created with an always-true Prometheus expression. The alert successfully reached Slack, displaying:
+
+`FIRING: RobotShopSlackDeliveryTest`
+
+The temporary test rule was subsequently deleted.
+
+![Prometheus alert rule](screenshots/07-prometheus-alerts.png)
+
+*Screenshot 7: Prometheus alert rule configured for Robot Shop pod availability.*
+
+![Slack notification](screenshots/08-slack-alert.png)
+
+*Screenshot 8: Successful Slack delivery test for Robot Shop alert notifications.*
+
+## 7. Step Six — Perform the Incident Drill
+
+An incident drill was performed by deliberately deleting a Cart pod to test Kubernetes recovery behaviour.
+
+Kubernetes recreated the pod. The incident and recovery observations were documented in:
+
+- `docs/incident-runbook.md`
+- `docs/incident-postmortem.md`
+
+The postmortem records the incident, recovery observations, follow-up actions, and blameless analysis.
+
+The drill demonstrated pod recovery. The application root path returned HTTP 404 during one check, so that response should not be treated as proof that a valid Cart API request succeeded.
+
+![Cart pod recovery](screenshots/09-incident-recovery.png)
+
+*Screenshot 9: Cart deployment verified healthy after the recovery drill.*
+
+![Incident postmortem](screenshots/10-incident-postmortem.png)
+
+*Screenshot 10: Incident postmortem documenting recovery, root cause, and follow-up actions.*
+
+## 8. NGINX Exporter — Additional Configuration
+
+An NGINX Prometheus exporter manifest was added to:
+
+`monitoring/nginx-exporter/deployment.yaml`
+
+It defines the exporter Deployment, Service, and ServiceMonitor.
+
+**Status:** The manifest is committed to GitHub, but the exporter has not been verified running and its live metrics have not been confirmed. It is therefore documented as additional configuration rather than a completed monitoring component.
+
+## 9. Repository Deliverables
+
+| Deliverable | Location |
+|---|---|
+| Grafana dashboard export | `monitoring/grafana/robot-shop-application-metrics.json` |
+| Slack Alertmanager configuration | `monitoring/alertmanager/robot-shop-slack.yaml` |
+| NGINX exporter manifest | `monitoring/nginx-exporter/deployment.yaml` |
+| SLO and error-budget policy | `docs/slo-error-budget.md` |
+| Incident runbook | `docs/incident-runbook.md` |
+| Incident postmortem | `docs/incident-postmortem.md` |
+| Implementation evidence | `screenshots/` |
+
+Logging and tracing configuration files are also maintained in the repository's monitoring configuration directories.
+
+## 10. Current Status and Outstanding Work
+
+### Verified
+
+- Robot Shop was deployed on EKS.
+- Prometheus and Grafana are installed.
+- The Grafana dashboard was exported as JSON.
+- Loki logs were searchable in Grafana.
+- Cart traces were observed in Jaeger.
+- The Robot Shop pod-readiness alert and runbook reference are configured.
+- A temporary test alert successfully delivered a notification to Slack.
+- The incident drill, runbook, SLO policy, and postmortem are documented.
+- Changes have been committed and pushed to GitHub.
+
+### Outstanding
+
+- Add request-rate, error-rate, and latency panels to the Grafana dashboard.
+- Verify that the NGINX exporter can scrape its target and expose live metrics.
+- Capture and commit the screenshots listed in this README.
+- Perform a final end-to-end review of the application, monitoring, and alerting deliverables.
+
+## 11. Security Notes
+
+- Slack webhook URLs are stored in Kubernetes Secrets and must not be committed to Git.
+- Do not include passwords, access tokens, private keys, or webhook URLs in screenshots.
+- Redact sensitive account details before publishing evidence.
+
+## Conclusion
+
+This project demonstrates practical DevOps work involving Kubernetes application deployment, monitoring, centralized logging, distributed tracing, alerting, and incident recovery. The repository contains the implementation artifacts and operational documentation, with outstanding work explicitly identified so the final submission accurately represents the state of the environment.
