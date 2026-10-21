@@ -21,3 +21,12 @@
 ## Next Actions
 - Instrument a Robot Shop service with OpenTelemetry and confirm an application trace in Jaeger.
 - Configure notification delivery if a Slack workspace becomes available.
+
+### OpenTelemetry tracing verification
+
+- Instrumented the Cart Node.js service with OpenTelemetry auto-instrumentation.
+- Configured OTLP HTTP export to Jaeger at `http://jaeger.monitoring.svc.cluster.local:4318`.
+- Increased Cart memory limits to 256Mi and requests to 128Mi to prevent OOM kills.
+- Verified real Cart traces in Jaeger on 21 October 2026.
+- Observed HTTP traces for `GET /` and `GET /metrics`, along with Redis-related spans.
+- Jaeger displayed 11 traces during verification.

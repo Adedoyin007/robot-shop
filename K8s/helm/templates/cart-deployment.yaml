@@ -6,6 +6,11 @@ metadata:
     service: cart
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       service: cart
@@ -19,8 +24,15 @@ spec:
       {{ end }}
       containers:
       - name: cart
-        image: {{ .Values.image.repo }}/rs-cart:{{ .Values.image.version }}
+        image: asiwaju007/rs-cart:otel
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: OTEL_SERVICE_NAME
+          value: cart
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://jaeger.monitoring.svc.cluster.local:4318
+        - name: OTEL_TRACES_EXPORTER
+          value: otlp
         # agent networking access
 
         ports:
@@ -28,10 +40,10 @@ spec:
         resources:
           limits:
             cpu: 200m
-            memory: 100Mi
+            memory: 256Mi
           requests:
             cpu: 100m
-            memory: 50Mi
+            memory: 128Mi
       {{- with .Values.cart.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
