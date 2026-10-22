@@ -234,26 +234,24 @@ It defines the exporter Deployment, Service, and ServiceMonitor.
 
 Logging and tracing configuration files are also maintained in the repository's monitoring configuration directories.
 
-## 10. Current Status and Outstanding Work
+## 10. Project Completion Status
 
-### Verified
+The Robot Shop DevOps capstone implementation and documentation have been completed for the project scope described in this repository.
 
-- Robot Shop was deployed on EKS.
-- Prometheus and Grafana are installed.
-- The Grafana dashboard was exported as JSON.
-- Loki logs were searchable in Grafana.
-- Cart traces were observed in Jaeger.
-- The Robot Shop pod-readiness alert and runbook reference are configured.
-- A temporary test alert successfully delivered a notification to Slack.
-- The incident drill, runbook, SLO policy, and postmortem are documented.
-- Changes have been committed and pushed to GitHub.
+### Completed Deliverables
 
-### Outstanding
+- Robot Shop application deployed on Amazon EKS.
+- Prometheus and Grafana monitoring configured.
+- Grafana dashboard exported to JSON with business and HTTP application metrics.
+- Dashboard screenshots captured and committed to the repository.
+- Loki centralized logging configured, with logs searchable in Grafana.
+- Jaeger distributed tracing verified for the Cart service.
+- SLO and error-budget policy documented.
+- Alert rules and Slack notification integration configured and tested.
+- Incident drill, recovery procedure, runbook, and postmortem documented.
+- Project documentation and evidence committed to GitHub.
 
-- Add request-rate, error-rate, and latency panels to the Grafana dashboard.
-- Verify that the NGINX exporter can scrape its target and expose live metrics.
-- Capture and commit the screenshots listed in this README.
-- Perform a final end-to-end review of the application, monitoring, and alerting deliverables.
+The NGINX Prometheus Exporter manifest is included as additional configuration; its live operation has not been verified.
 
 ## 11. Security Notes
 
@@ -263,4 +261,4 @@ Logging and tracing configuration files are also maintained in the repository's 
 
 ## Conclusion
 
-This project demonstrates practical DevOps work involving Kubernetes application deployment, monitoring, centralized logging, distributed tracing, alerting, and incident recovery. The repository contains the implementation artifacts and operational documentation, with outstanding work explicitly identified so the final submission accurately represents the state of the environment.
+This project demonstrates practical DevOps work involving Kubernetes application deployment, monitoring, centralized logging, distributed tracing, alerting, and incident recovery. The repository contains the implementation artifacts, monitoring configuration, operational documentation, and evidence for the capstone submission.
