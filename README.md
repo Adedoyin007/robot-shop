@@ -74,21 +74,40 @@ Grafana was then opened at `http://localhost:3000`.
 
 ### Dashboard export
 
-The dashboard was exported and committed to the repository:
+The Grafana dashboard was exported and committed to the repository:
 
 `monitoring/grafana/robot-shop-application-metrics.json`
 
-The exported dashboard currently contains business metrics including:
+The dashboard, titled **Robot Shop - Requests, Errors, Latency**, combines business metrics and HTTP application metrics.
 
-- Items added to cart.
+**Dashboard panels:**
+- Total items added to cart.
 - Total items sold.
 - Average cart value over five minutes.
+- HTTP requests per second.
+- HTTP 5xx errors per second.
+- HTTP request latency at the 95th percentile (p95).
+- HTTP status-code breakdown.
 
-![Grafana dashboard](screenshots/04-grafana-dashboard.png)
+The HTTP metrics are currently instrumented for the Cart service. The 5xx error panel may display “No data” when no matching server errors have been recorded.
 
-*Screenshot 4: Grafana dashboard displaying Robot Shop business metrics.*
+**Accessing Grafana**
 
-**Known improvement:** The dashboard still needs panels for request rate, error rate, and latency to fully demonstrate the metrics-dashboard requirement.
+Start port forwarding from the terminal:
+
+```bash
+kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
+```
+
+Open `http://localhost:3000` in a browser and navigate to the **Robot Shop - Requests, Errors, Latency** dashboard.
+
+![Grafana dashboard — top panels](screenshots/04a-grafana-dashboard-top.png)
+
+*Screenshot 4a: Grafana dashboard showing the top panels and Robot Shop business metrics.*
+
+![Grafana dashboard — bottom panels](screenshots/04b-grafana-dashboard-bottom.png)
+
+*Screenshot 4b: Grafana dashboard showing the remaining HTTP request, error, latency, and status-code panels.*
 
 ## 4. Step Three — Configure Centralized Logging
 
