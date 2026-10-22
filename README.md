@@ -236,22 +236,31 @@ Logging and tracing configuration files are also maintained in the repository's 
 
 ## 10. Project Completion Status
 
-The Robot Shop DevOps capstone implementation and documentation have been completed for the project scope described in this repository.
+The Robot Shop DevOps capstone deliverables are documented in this repository.
 
-### Completed Deliverables
+### Application and Infrastructure
+- Robot Shop deployed on Amazon EKS.
+- Kubernetes workloads and application health verified.
 
-- Robot Shop application deployed on Amazon EKS.
-- Prometheus and Grafana monitoring configured.
-- Grafana dashboard exported to JSON with business and HTTP application metrics.
-- Dashboard screenshots captured and committed to the repository.
+### Monitoring and Observability
+- Prometheus and Grafana configured.
+- Grafana dashboard exported to `monitoring/grafana/robot-shop-application-metrics.json`.
+- Dashboard screenshots captured and committed.
+- Cart HTTP request metrics instrumented.
 - Loki centralized logging configured, with logs searchable in Grafana.
 - Jaeger distributed tracing verified for the Cart service.
+
+### Reliability and Incident Management
 - SLO and error-budget policy documented.
 - Alert rules and Slack notification integration configured and tested.
-- Incident drill, recovery procedure, runbook, and postmortem documented.
-- Project documentation and evidence committed to GitHub.
+- Incident drill completed and documented.
+- Incident runbook and postmortem included.
 
-The NGINX Prometheus Exporter manifest is included as additional configuration; its live operation has not been verified.
+### Repository and Evidence
+- README and supporting project documentation updated.
+- Configuration files, runbooks, postmortem, dashboard JSON, and screenshots committed to GitHub.
+
+The NGINX Prometheus Exporter manifest is included as additional configuration. Its live operation has not been verified, and this README does not claim that it is operational.
 
 ## 11. Security Notes
 
